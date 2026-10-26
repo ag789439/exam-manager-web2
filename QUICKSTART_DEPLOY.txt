@@ -1,0 +1,47 @@
+EXAM MANAGER - WEBSITE - 6 STEP DEPLOY
+======================================
+
+STEP 1  Extract this zip. You should see:
+        app.py   templates/   static/   requirements.txt
+        Procfile   render.yaml   README_DEPLOY.md
+
+STEP 2  GitHub -> New repository -> name it "exam-manager-web" -> Create.
+        On the empty repo page click "uploading an existing file".
+        Drag ALL the files and the TWO folders (templates, static) in.
+        Click "Commit changes".
+
+        IMPORTANT: app.py must sit at the TOP level of the repo,
+        not inside a folder.
+
+STEP 3  Render -> New + -> Blueprint -> pick that repository -> Apply.
+        (Render reads render.yaml and fills everything in for you.)
+
+        No Blueprint option? Use New + -> Web Service instead:
+          Build command:  pip install -r requirements.txt
+          Start command:  gunicorn app:app --bind 0.0.0.0:$PORT --workers 2
+
+STEP 4  When Render asks for the environment variable APP_PASSWORD,
+        type a password you will remember (e.g. jindal@2026).
+        This is the login password for the site.
+
+STEP 5  Wait for the build to finish (2-3 minutes), then open:
+             https://<your-app>.onrender.com/healthz
+        All items should say "ok": true.
+
+STEP 6  Open the root URL, log in with APP_PASSWORD, and use the site.
+
+IF THE FOLDERS DO NOT UPLOAD
+   Uploading the files one by one puts base.html, students.html,
+   style.css ... loose in the repo root. That is fine now: on boot the app
+   moves them into templates/ and static/ by itself and logs
+   "moved 11 loose file(s) into place". The site works either way.
+
+CHECKING WHICH VERSION IS LIVE
+   "/" shows four dead cards  -> old code, deploy did not happen
+   "/healthz" gives 404       -> old code
+   "/healthz" gives JSON      -> new code is live
+
+FREE PLAN WARNING
+   The database is wiped on every redeploy/restart. For real use, add a
+   Render Disk mounted at /var/data and set DB_PATH=/var/data/exam_manager.db
+   (see README_DEPLOY.md).
